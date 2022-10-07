@@ -26,7 +26,7 @@ else
 	echo "NO match"
 	echo "[-] Aborting git rebase!"
 	git rebase --abort
-	exit 1
+	exit 101
 fi
 
 git rebase --abort
