@@ -31,6 +31,8 @@ SIGNER="$(echo $VERIFY_COMMIT | grep 'gitsign: Good signature from' | sed 's/.*\
 # Validations
 # ===================================
 
+echo "[*] Verifying author '$COMMIT_EMAIL'"
+
 # Validate that the commit is signed
 if [ -z "$SIGNER" ]; then
 	echo "[-] Commit is NOT signed!"
@@ -41,10 +43,29 @@ fi
 echo -n "[!] Commit Author Email: '$COMMIT_EMAIL' - Signed by '$SIGNER'... "
 if [ "$SIGNER" = "$COMMIT_EMAIL" ]; then
 	echo "match"
-	exit 0
 else
 	echo "NO match"
 	exit 102
 fi
 
-exit 255
+# Validate if signer's email is allowed to commit
+valid_domain=0
+if [ ! -z "$EMAIL_DOMAINS" ]; then
+	echo "[*] Verifying author ('$COMMIT_EMAIL') against following domains: '$EMAIL_DOMAINS'"
+	for domain in "$EMAIL_DOMAINS"; do
+		if [[ "$COMMIT_EMAIL" == "*@${domain}" ]]; then
+			echo "[+] Author's email domain found: '$domain'"
+			valid_domain=1
+			break
+		fi
+	done
+
+	if [ $valid_domain != 0 ]; then
+		echo "[-] Commit author's domain is not allowed ('$COMMIT_EMAIL')"
+		exit 103
+	fi
+fi
+
+
+
+exit 0
