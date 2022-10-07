@@ -25,9 +25,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name:
-      run:
-        ls -la
+    - name: Fetch all refs
+      run: |
+        git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
 
     - name: Check Signatures
       uses: skroutz-internal/gitsign-action@master
+      with:
+        main-branch: origin/master
