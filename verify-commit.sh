@@ -60,7 +60,7 @@ if [ ! -z "$EMAIL_DOMAINS" ]; then
 		fi
 	done
 
-	if [ $valid_domain != 0 ]; then
+	if [ $valid_domain = 0 ]; then
 		echo "[-] Commit author's domain is not allowed ('$COMMIT_EMAIL')"
 		exit 103
 	fi

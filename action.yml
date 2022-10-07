@@ -43,7 +43,7 @@ runs:
     - name: Verify Commits
       shell: bash
       run: |
-        COMMITS="$(git rev-list ${{ inputs.main-branch }}..HEAD)"
+        COMMITS="$(git rev-list ${{ inputs.ref }}..HEAD)"
         echo "[*] Verifying commits: '$COMMITS'"
 
         export EMAIL_DOMAINS="${{ inputs.email-domains }}"
