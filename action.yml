@@ -21,6 +21,10 @@ inputs:
 runs:
   using: "composite"
   steps:
+
+    - run: echo "${{ github.action_path }}" >> $GITHUB_PATH
+      shell: bash
+
     - name: Install Gitsign
       shell: bash
       run: |
@@ -34,7 +38,7 @@ runs:
     - name: Verify Commits
       shell: bash
       run: |
-        git rebase ${{ inputs.main-branch }} -x ./verify-command.sh
+        git rebase ${{ inputs.main-branch }} -x ./verify-commit.sh
         EXIT_CODE="$?"
 
         if [ $EXIT_CODE != "0" ]; then
