@@ -5,13 +5,14 @@
 
 # Extract Commit Author's email
 COMMIT_HASH="$(git log -1 --pretty=format:'%H')"
+COMMIT_HASH=${1:-HEAD}
 echo "[+] Checking commit '$COMMIT_HASH'"
 
 # Extract Commit Author's email
 COMMIT_EMAIL="$(git log -1 --pretty=format:'%ae')"
 
 # Use gitsign to verify signature
-VERIFY_COMMIT="$(git verify-commit -v HEAD 2>&1)"
+VERIFY_COMMIT="$(git verify-commit -v $COMMIT_HASH 2>&1)"
 
 # Extract email of SigningCertificate (obtained through OIDC)
 SIGNER="$(echo $VERIFY_COMMIT | grep 'gitsign: Good signature from' | sed 's/.*\[\([^]]*\)\].*/\1/g')"
@@ -24,10 +25,7 @@ if [ "$SIGNER" = "$COMMIT_EMAIL" ]; then
 	exit 0
 else
 	echo "NO match"
-	echo "[-] Aborting git rebase!"
-	git rebase --abort
 	exit 101
 fi
 
-git rebase --abort
 exit 255

@@ -38,11 +38,14 @@ runs:
     - name: Verify Commits
       shell: bash
       run: |
-        git rebase ${{ inputs.main-branch }} -x ./verify-commit.sh
-        EXIT_CODE="$?"
+        for commit in $(git rev-list  ${{ inputs.main-branch }}..HEAD); do
+          ./verify-commit.sh "$commit"
+          EXIT_CODE="$?"
 
-        if [ $EXIT_CODE != "0" ]; then
-          echo "A commit was found without a signature or with an invalid one"
-          echo "Use the following command to automatically resign your branch:"
-          echo "    git rebase ${{ inputs.main-branch }} -x 'git commit --allow-empty --amend -S --no-edit'"
-        fi
+          if [ $EXIT_CODE != "0" ]; then
+            echo "A commit was found without a signature or with an invalid one"
+            echo "Use the following command to automatically resign your branch:"
+            echo "    git rebase ${{ inputs.main-branch }} -x 'git commit --allow-empty --amend -S --no-edit'"
+            break
+          fi
+        done
