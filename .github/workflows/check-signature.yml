@@ -20,9 +20,14 @@ concurrency:
 jobs:
   check-signatures:
     runs-on: "ubuntu-latest"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
 
-      - name: Check Signatures
-        uses: ./action.yml
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name:
+      run:
+        ls -la
+
+    - name: Check Signatures
+      uses: skroutz-internal/gitsign-action@master
