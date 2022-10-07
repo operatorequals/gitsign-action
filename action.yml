@@ -13,10 +13,10 @@ inputs:
     required: true
     default: 'origin/master'
 
-# outputs:
-#   random-number:
-#     description: "Random number"
-#     value: ${{ steps.random-number-generator.outputs.random-number }}
+  email-domains:
+    description: 'Email Domains that are allowed to sign commits'
+    required: false
+    default: ""
 
 runs:
   using: "composite"
@@ -25,14 +25,19 @@ runs:
     - run: echo "${{ github.action_path }}" >> $GITHUB_PATH
       shell: bash
 
-    - name: Install Gitsign
+    - name: '[Gitsign] install'
       shell: bash
       run: |
         # Get binary
         wget -q https://github.com/sigstore/gitsign/releases/download/v${{ inputs.version }}/gitsign_${{ inputs.version }}_linux_amd64 -O gitsign
+        chmod +x ./gitsign
+        ./gitsign -v
 
+    - name: '[Git] setup signing program'
+      shell: bash
+      run: |
         # Set gitsign as git commit verifier
-        git config --local gpg.x509.program $(pwd)/gitsign
+        git config --local gpg.x509.program ./gitsign
         git config --local gpg.format x509
 
     - name: Verify Commits
@@ -41,7 +46,10 @@ runs:
         COMMITS="$(git rev-list ${{ inputs.main-branch }}..HEAD)"
         echo "[*] Verifying commits: '$COMMITS'"
 
+        export EMAIL_DOMAINS="${{ inputs.email-domains }}"
+        echo $EMAIL_DOMAINS
+
         for commit in ${COMMITS}; do
           # If script fails, the action stops
-          ./verify-commit.sh "$commit"
+          verify-commit.sh "$commit"
         done
