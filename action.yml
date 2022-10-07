@@ -25,7 +25,7 @@ runs:
       shell: bash
       run: |
         # Get binary
-        wget https://github.com/sigstore/gitsign/releases/download/v${{ inputs.version }}/gitsign_${{ inputs.version }}_linux_amd64 -O gitsign
+        wget -q https://github.com/sigstore/gitsign/releases/download/v${{ inputs.version }}/gitsign_${{ inputs.version }}_linux_amd64 -O gitsign
 
         # Set gitsign as git commit verifier
         git config --local gpg.x509.program $(pwd)/gitsign
