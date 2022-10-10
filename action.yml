@@ -14,7 +14,7 @@ inputs:
     default: 'origin/master'
 
   email-domains:
-    description: 'Email Domains that are allowed to sign commits'
+    description: 'Email Domains that are allowed to sign commits (space-separated list)'
     required: false
     default: ""
 
