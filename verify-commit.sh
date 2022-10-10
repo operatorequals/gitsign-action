@@ -16,7 +16,7 @@ function show_help() {
 
 # Extract Commit Author's email
 COMMIT_HASH=${1:-HEAD}
-echo "[+] Checking commit '$COMMIT_HASH'"
+echo "[>] Checking commit '$COMMIT_HASH'"
 
 # Extract Commit Author's email
 COMMIT_EMAIL="$(git log -1 --pretty=format:'%ae')"
