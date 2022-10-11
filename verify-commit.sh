@@ -51,9 +51,9 @@ fi
 # Validate if signer's email is allowed to commit
 valid_domain=0
 if [ ! -z "$EMAIL_DOMAINS" ]; then
-	echo "[*] Verifying author ('$COMMIT_EMAIL') against following domains: '$EMAIL_DOMAINS'"
+	echo "[*] Verifying author ('$COMMIT_EMAIL') against following domains: [${EMAIL_DOMAINS}]"
 	for domain in "$EMAIL_DOMAINS"; do
-		if [[ "$COMMIT_EMAIL" == "*@${domain}" ]]; then
+		if [[ "$COMMIT_EMAIL" =~ "@${domain}" ]]; then
 			echo "[+] Author's email domain found: '$domain'"
 			valid_domain=1
 			break
