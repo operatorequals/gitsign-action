@@ -1,0 +1,32 @@
+name: 'Check Commit Signatures on branch'
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+
+
+# This allows a subsequently queued workflow run to interrupt previous runs
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  check-signatures:
+    runs-on: "ubuntu-latest"
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Fetch all refs
+      run: |
+        git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+
+    - name: Check Signatures
+      uses: operatorequals/gitsign-action@master
+      with:
+        ref: origin/init
+        version: '0.3.1'
