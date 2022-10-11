@@ -59,9 +59,9 @@ runs:
 
         echo "[*] Verifying commits: [$COMMITS]"
 
-        export EMAIL_DOMAINS="${{ inputs.email-domains }}"
-
         for commit in ${COMMITS}; do
           # If script fails, the action stops
           verify-commit.sh "$commit"
         done
+      env:
+        EMAIL_DOMAINS: '${{ inputs.email-domains }}'
