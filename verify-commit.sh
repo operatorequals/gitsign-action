@@ -66,6 +66,4 @@ if [ ! -z "$EMAIL_DOMAINS" ]; then
 	fi
 fi
 
-
-echo "[+] All signatures verified!"
 exit 0
