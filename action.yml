@@ -48,6 +48,7 @@ runs:
         # Fetch git refs to recognise 'ref' input
 
         git fetch origin ${{ github.ref }} --shallow-exclude ${{ inputs.ref }}
+        git fetch origin ${{ inputs.ref }}
 
     - name: '[Gitsign] Verify Commits'
       shell: bash
