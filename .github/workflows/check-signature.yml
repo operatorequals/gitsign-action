@@ -20,10 +20,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-
-    - name: Fetch all refs
-      run: |
-        git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+      with:
+        fetch-depth: 0
 
     - name: Check Signatures
       uses: operatorequals/gitsign-action@master
