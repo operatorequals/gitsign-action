@@ -8,6 +8,7 @@ The Github Action verifies that all commits between `HEAD` and the git ref speci
 
 * Are *signed* by the `gitsign` tool
 * The signer's name (the `SigngingCertificate`'s `X509v3 SAN:email`) is the same with the git commit's author email
+* The Identity Provider URL used by the signer to provide the `email` to Fulcio is one of the [SigStore trusted IdPs (Github, Google, Microsoft)](https://github.com/sigstore/gitsign/tree/master#file-config) (changeable through `connector-ids` input)
 * If the `email-domains` input is set - the signer's email domain is in the `email-domains` list
 
 ## How it works
