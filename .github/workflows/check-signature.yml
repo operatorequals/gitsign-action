@@ -20,8 +20,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
 
     - name: Check Signatures
       uses: operatorequals/gitsign-action@master
