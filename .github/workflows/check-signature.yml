@@ -26,3 +26,4 @@ jobs:
       with:
         ref: init
         version: '0.3.1'
+        email-domains: 'gmail.com'
