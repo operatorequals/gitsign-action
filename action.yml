@@ -47,14 +47,14 @@ runs:
       run: |
         # Fetch git refs to recognise 'ref' input
 
-        git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+        git fetch origin ${{ inputs.ref }}
 
     - name: '[Gitsign] Verify Commits'
       shell: bash
       run: |
         # Loop though commits HEAD to 'ref' and check signatures
 
-        COMMITS="$(git rev-list refs/heads/${{ inputs.ref }}..HEAD)"
+        COMMITS="$(git rev-list origin/${{ inputs.ref }}..HEAD)"
         echo "[*] Verifying commits: [$COMMITS]"
 
         export EMAIL_DOMAINS="${{ inputs.email-domains }}"
