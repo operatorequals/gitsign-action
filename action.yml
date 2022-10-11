@@ -54,7 +54,7 @@ runs:
       run: |
         # Loop though commits HEAD to 'ref' and check signatures
 
-        COMMITS="$(git rev-list ${{ inputs.ref }}..HEAD)"
+        COMMITS="$(git rev-list refs/heads/${{ inputs.ref }}..HEAD)"
         echo "[*] Verifying commits: [$COMMITS]"
 
         export EMAIL_DOMAINS="${{ inputs.email-domains }}"
