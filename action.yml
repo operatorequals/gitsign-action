@@ -18,6 +18,12 @@ inputs:
     required: false
     default: ""
 
+  connector-ids:
+    description: 'The Identity Providers that are trusted to authenticate the signers (space-separated list)'
+    required: true
+    # default: Officialy supported IdPs (Github, Google, Microsoft)
+    default: "https://github.com/login/oauth https://accounts.google.com https://login.microsoftonline.com"
+
 runs:
   using: "composite"
   steps:
@@ -67,3 +73,4 @@ runs:
         echo "[+] All signatures verified!"
       env:
         EMAIL_DOMAINS: '${{ inputs.email-domains }}'
+        ACCEPTED_CONNECTOR_IDS: '${{ inputs.connector-ids }}'
