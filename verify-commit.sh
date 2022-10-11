@@ -60,7 +60,7 @@ fi
 valid_domain=0
 if [ ! -z "$EMAIL_DOMAINS" ]; then
 	echo "[*] Verifying author ('$COMMIT_EMAIL') against following domains: [${EMAIL_DOMAINS}]"
-	for domain in "$EMAIL_DOMAINS"; do
+	for domain in ${EMAIL_DOMAINS}; do
 		if [[ "$COMMIT_EMAIL" =~ "@${domain}" ]]; then
 			echo "[+] Author's email domain found: '$domain'"
 			valid_domain=1
@@ -77,7 +77,7 @@ fi
 valid_connID=0
 if [ ! -z "$ACCEPTED_CONNECTOR_IDS" ]; then
 	echo "[*] Verifying authentication from trusted ConnectorIDs: [${ACCEPTED_CONNECTOR_IDS}]"
-	for connID in "$ACCEPTED_CONNECTOR_IDS"; do
+	for connID in ${ACCEPTED_CONNECTOR_IDS}; do
 		if [ "$CONNECTOR_ID" = "${connID}" ]; then
 			echo "[+] Author's ConnectorID found: '$connID'"
 			valid_connID=1
