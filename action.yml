@@ -63,5 +63,7 @@ runs:
           # If script fails, the action stops
           verify-commit.sh "$commit"
         done
+
+        echo "[+] All signatures verified!"
       env:
         EMAIL_DOMAINS: '${{ inputs.email-domains }}'
