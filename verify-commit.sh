@@ -14,7 +14,7 @@ function show_help() {
 # Globals
 # ===================================
 
-# Extract Commit Author's email
+# Get Commit Hash
 COMMIT_HASH=${1:-HEAD}
 echo "[>] Checking commit '$COMMIT_HASH'"
 

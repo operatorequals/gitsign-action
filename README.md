@@ -17,19 +17,19 @@ The Github Action loops through the commits between `ref` input and `HEAD`.
 If a non-verifiable commit is found, the Github Action fails and reports which commit failed to verify.
 
 ```
-[commit*N] {branch1} (checked) <-- Action runs in this commit
+[commit+N] {branch1} (checked) <-- Action runs in this commit
   |
   v
-[commit*N-1] (checked)
+[commit+N-1] (checked)
   |
   v
 [...] (checked)
   |
   v
-[commit*1] (checked)
+[commit+1] (checked)
   |
   v
-[commit] {ref=origin/master} 
+[commit] {ref=master}
 ```
 
 ## Usage
@@ -49,7 +49,7 @@ jobs:
       uses: operatorequals/gitsign-action@master
       with:
       	version: '0.3.1'	# default '0.3.1'
-        ref: origin/master	# default 'origin/master'
+        ref: master	      # default 'origin/master'
         email-domains: "gmail.com users.noreply.github.com" # default ''
         connector-ids: "https://github.com/login/oauth https://accounts.google.com" # default 'Github, Google, Microsoft'
 
