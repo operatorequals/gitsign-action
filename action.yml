@@ -1,0 +1,65 @@
+name: 'Gitsign Verify'
+
+description: 'Uses `gitsign` to verify commit signatures of a branch'
+
+inputs:
+  version:
+    description: 'Version of `gitsign` binary'
+    required: true
+    default: '0.3.1'
+
+  ref:
+    description: 'Git ref to check against'
+    required: true
+    default: 'origin/master'
+
+  email-domains:
+    description: 'Email Domains that are allowed to sign commits (space-separated list)'
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+
+    - run: echo "${{ github.action_path }}" >> $GITHUB_PATH
+      shell: bash
+
+    - name: '[Gitsign] install'
+      shell: bash
+      run: |
+        # Get gitsign binary
+
+        wget -q https://github.com/sigstore/gitsign/releases/download/v${{ inputs.version }}/gitsign_${{ inputs.version }}_linux_amd64 -O gitsign
+        chmod +x ./gitsign
+        ./gitsign -v
+
+    - name: '[Git] Setup signing program'
+      shell: bash
+      run: |
+        # Set gitsign as git commit verifier
+
+        git config --local gpg.x509.program ./gitsign
+        git config --local gpg.format x509
+
+    - name: '[Git] Fetch all git refs'
+      shell: bash
+      run: |
+        # Fetch git refs to recognise 'ref' input
+
+        git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+
+    - name: '[Gitsign] Verify Commits'
+      shell: bash
+      run: |
+        # Loop though commits HEAD to 'ref' and check signatures
+
+        COMMITS="$(git rev-list ${{ inputs.ref }}..HEAD)"
+        echo "[*] Verifying commits: [$COMMITS]"
+
+        export EMAIL_DOMAINS="${{ inputs.email-domains }}"
+
+        for commit in ${COMMITS}; do
+          # If script fails, the action stops
+          verify-commit.sh "$commit"
+        done
