@@ -48,7 +48,7 @@ jobs:
     - name: Check Signatures
       uses: operatorequals/gitsign-action@master
       with:
-      	version: '0.3.1'	# default '0.3.1'
+        version: '0.3.1'  # default '0.3.1'
         ref: master	      # default 'origin/master'
         email-domains: "gmail.com users.noreply.github.com" # default ''
         connector-ids: "https://github.com/login/oauth https://accounts.google.com" # default 'Github, Google, Microsoft'
