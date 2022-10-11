@@ -28,5 +28,5 @@ jobs:
     - name: Check Signatures
       uses: operatorequals/gitsign-action@master
       with:
-        ref: origin/init
+        ref: init
         version: '0.3.1'
