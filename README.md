@@ -7,9 +7,10 @@ This Github Action verifies [Sigstore `gitsign`](https://github.com/sigstore/git
 The Github Action verifies that all commits between `HEAD` and the git ref specified in the `ref` input:
 
 * Are *signed* by the `gitsign` tool
-* The signer's name (the `SigngingCertificate`'s `X509v3 SAN:email`) is the same with the git commit's author email
+* The signer's name (the `SigningCertificate`'s `X509v3 SAN:email`) is the same with the git commit's author email
 * The Identity Provider URL used by the signer to provide the `email` to Fulcio is one of the [SigStore trusted IdPs (Github, Google, Microsoft)](https://github.com/sigstore/gitsign/tree/master#file-config) (changeable through `connector-ids` input)
 * If the `email-domains` input is set - the signer's email domain is in the `email-domains` list
+* If the `check-signing-date` input is set to `true` - the commit date falls in the `SigningCertificate`'s Validity Period (`Cert NotBefore` <= `Commit Date` <= `Cert Not After`).
 
 ## How it works
 
@@ -94,3 +95,19 @@ and `gitsign verify` will rightfully verify the signature.
 In this Github Action, if the expected ConnectorID is not Google (e.g the organization's flow strictly requires Github SSO
 for commit signing), setting `connector-ids: "https://accounts.google.com"` will fail to verify any signature that does not
 have `https://accounts.google.com` in the PKCS#7 field `1.3.6.1.4.1.57264.1.1` (https://github.com/sigstore/gitsign#inspecting-the-git-commit-signature).
+
+### Fully compromises the identity of `jdoe@example.com` and pushes an amended commit
+
+With full access to `jdoe@example.com` identity (through the trusted IdP), the adversary can create perfectly signed commits
+(that rightfully pass `gitsign verify`).
+
+Given that adding NEW commits to the deployable code (pushing/merging to deployable branches) would require peer-review, amending a deployable branch would be a plausible way to inject code.
+
+If this Github Action is used, setting `check-signing-date: true` will additionally try to verify that all commits are signed in their
+`SigningCertificate` Validity date window, thous failing to verify the amended commits, as they are signed with a Certificate issued
+after the original commits were made (created by the adversary's through `jdoe@example.com` stolen identity).
+
+Re-dating commits and resigning to bypass this check is also plausible (e.g `git commit -S --amend --date="..."`), and cannot be thoroughly
+prevented without verifying commits in a non-atomic way (verification requires information from previous commits).
+
+Yet, apart from amending history to deployable branches being a highly destructive action (diverging commit histories of cloned repositories - disrupting `git pull`), it also creates a visual clue in Github and Gitlab UI (e.g annotations like `X days/months/years ago` next to changed files), making the action very detectable.
