@@ -15,11 +15,20 @@ function show_help() {
 # ===================================
 
 # Get Commit Hash
-COMMIT_HASH=${1:-HEAD}
+INPUT=${1:-HEAD}
+
+# Extract Commit Hash
+COMMIT_HASH="$(git log -1 $INPUT --pretty=format:'%h')"
 echo "[>] Checking commit '$COMMIT_HASH'"
 
 # Extract Commit Author's email
-COMMIT_EMAIL="$(git log -1 --pretty=format:'%ae')"
+COMMIT_EMAIL="$(git log -1 $COMMIT_HASH --pretty=format:'%ce')"
+
+# Extract Commit Date as Unix Timestamp
+COMMIT_DATE_U="$(git log -1 $COMMIT_HASH --pretty=format:'%ct')"
+
+# Also get Commit Date in GMT (to match SigningCertificate dates)
+COMMIT_DATE="$(TZ="GMT" git log -1 $COMMIT_HASH --pretty=format:'%cd' --date='local' ) $TZ"
 
 # Use gitsign to verify signature
 VERIFY_COMMIT="$(git verify-commit -v $COMMIT_HASH 2>&1)"
@@ -34,6 +43,14 @@ COMMIT_SIGNATURE="$(git cat-file commit $COMMIT_HASH | sed -n '/BEGIN/, /END/p' 
 # Extract ConnectorID by parsing PKCS#7 format (openssl does not support it)
 PKCS7_FIELD_CONNECTOR_ID="1.3.6.1.4.1.57264.1.1"
 CONNECTOR_ID="$(openssl pkcs7 -in <(echo "${COMMIT_SIGNATURE}") -print | grep $PKCS7_FIELD_CONNECTOR_ID -A6 | grep 'value:' -A5 | grep 0000 -A2 | sed 's/^.*- \(.*\)  .*$/\1/g' | tr '-' ' ' | tr -d '\n ' | xxd -p -r | strings)"
+
+# Extract SigningCertificate Validity Period (format: '%b %d %T %Y' GMT)
+DATE_NOT_BEFORE="$(openssl pkcs7 -in <(echo "${COMMIT_SIGNATURE}") -print | grep validity -A2 | grep 'notBefore' | cut -d ':' -f 2-)"
+DATE_NOT_AFTER="$(openssl pkcs7 -in <(echo "${COMMIT_SIGNATURE}") -print | grep validity -A2 | grep 'notAfter' | cut -d ':' -f 2-)"
+
+# Convert Dates to Unix Timestamps
+DATE_NOT_BEFORE_U="$(date +%s --date="${DATE_NOT_BEFORE}")"
+DATE_NOT_AFTER_U="$(date +%s --date="${DATE_NOT_AFTER}")"
 
 # ===================================
 # Validations
@@ -89,8 +106,22 @@ if [ ! -z "$ACCEPTED_CONNECTOR_IDS" ]; then
 		echo "[-] Author's ConnectorID is not allowed ('$CONNECTOR_ID')"
 		exit 104
 	fi
-
 fi
 
+if [ "$CHECK_SIGNING_DATE" = true ]; then
+	echo "[*] Verifying Commit Date is in SigningCertificate's Validity Period"
+	# echo "[@] ${DATE_NOT_BEFORE_U} <= ${COMMIT_DATE_U} <= ${DATE_NOT_AFTER_U}" # Debug
+
+	if [ "$COMMIT_DATE_U" -lt "$DATE_NOT_BEFORE_U" ]; then
+		echo "[-] Commit date '${COMMIT_DATE}' is BEFORE [${DATE_NOT_BEFORE}, ${DATE_NOT_AFTER}]"
+		exit 110
+	fi
+	if [ "$COMMIT_DATE_U" -gt "$DATE_NOT_AFTER_U" ]; then
+		echo "[-] Commit date '${COMMIT_DATE}' is AFTER [${DATE_NOT_BEFORE}, ${DATE_NOT_AFTER}]"
+		exit 111
+	fi
+
+	echo "[+] Commit date: '${COMMIT_DATE}' is in [${DATE_NOT_BEFORE}, ${DATE_NOT_AFTER}]"
+fi
 
 exit 0

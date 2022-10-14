@@ -24,6 +24,11 @@ inputs:
     # default: Officialy supported IdPs (Github, Google, Microsoft)
     default: "https://github.com/login/oauth https://accounts.google.com https://login.microsoftonline.com"
 
+  check-signing-date:
+    description: "Whether to verify that the Commit Date is in the SigningCertificate's Validity Period (Not Before <= Commit Date <= Not After)"
+    required: false
+    default: false
+
 runs:
   using: "composite"
   steps:
@@ -74,3 +79,4 @@ runs:
       env:
         EMAIL_DOMAINS: '${{ inputs.email-domains }}'
         ACCEPTED_CONNECTOR_IDS: '${{ inputs.connector-ids }}'
+        CHECK_SIGNING_DATE: '${{ inputs.check-signing-date }}'
