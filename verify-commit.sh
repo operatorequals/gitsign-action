@@ -24,11 +24,11 @@ echo "[>] Checking commit '$COMMIT_HASH'"
 # Extract Commit Author's email
 COMMIT_EMAIL="$(git log -1 $COMMIT_HASH --pretty=format:'%ce')"
 
-# Extract Commit Date as Unix Timestamp
-COMMIT_DATE_U="$(git log -1 $COMMIT_HASH --pretty=format:'%ct')"
+# Extract Commit Author Date as Unix Timestamp
+COMMIT_DATE_U="$(git log -1 $COMMIT_HASH --pretty=format:'%at')"
 
-# Also get Commit Date in GMT (to match SigningCertificate dates)
-COMMIT_DATE="$(TZ="GMT" git log -1 $COMMIT_HASH --pretty=format:'%cd' --date='local' ) $TZ"
+# Also get Commit Author Date in GMT (to match SigningCertificate dates)
+COMMIT_DATE="$(TZ="GMT" git log -1 $COMMIT_HASH --pretty=format:'%ad' --date='local' ) $TZ"
 
 # Use gitsign to verify signature
 VERIFY_COMMIT="$(git verify-commit -v $COMMIT_HASH 2>&1)"
