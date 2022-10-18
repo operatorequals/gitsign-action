@@ -56,72 +56,71 @@ DATE_NOT_AFTER_U="$(date +%s --date="${DATE_NOT_AFTER}")"
 # Validations
 # ===================================
 
-echo "[*] Verifying author '$COMMIT_EMAIL'"
 
 # Validate that the commit is signed
 if [ -z "$SIGNER" ]; then
-	echo "[-] Commit is NOT signed!"
+	echo "[-][$COMMIT_HASH] Commit is NOT signed!"
 	exit 101
 fi
 
 # Validate that the signer is the commit author
-echo -n "[!] Commit Author Email: '$COMMIT_EMAIL' - Signed by '$SIGNER'... "
+echo "[*][$COMMIT_HASH] Verifying author '$COMMIT_EMAIL'"
 if [ "$SIGNER" = "$COMMIT_EMAIL" ]; then
-	echo "match"
+	echo "[+][$COMMIT_HASH] Signed by '$SIGNER' (matching commit author)"
 else
-	echo "NO match"
+	echo "[-][$COMMIT_HASH] Signed by '$SIGNER'. Commit author '$COMMIT_EMAIL' does NOT match"
 	exit 102
 fi
 
 # Validate if signer's email is allowed to commit
 valid_domain=0
 if [ ! -z "$EMAIL_DOMAINS" ]; then
-	echo "[*] Verifying author ('$COMMIT_EMAIL') against following domains: [${EMAIL_DOMAINS}]"
+	echo "[*][$COMMIT_HASH] Verifying author ('$COMMIT_EMAIL') against following domains: [${EMAIL_DOMAINS}]"
 	for domain in ${EMAIL_DOMAINS}; do
 		if [[ "$COMMIT_EMAIL" =~ "@${domain}" ]]; then
-			echo "[+] Author's email domain found: '$domain'"
+			echo "[+][$COMMIT_HASH] Author's email domain found: '$domain'"
 			valid_domain=1
 			break
 		fi
 	done
 
 	if [ $valid_domain = 0 ]; then
-		echo "[-] Commit author's domain is not allowed ('$COMMIT_EMAIL')"
+		echo "[-][$COMMIT_HASH] Commit author's domain is not allowed ('$COMMIT_EMAIL')"
 		exit 103
 	fi
 fi
 
 valid_connID=0
 if [ ! -z "$ACCEPTED_CONNECTOR_IDS" ]; then
-	echo "[*] Verifying authentication from trusted ConnectorIDs: [${ACCEPTED_CONNECTOR_IDS}]"
+	echo "[*][$COMMIT_HASH] Verifying authentication from trusted ConnectorIDs: [${ACCEPTED_CONNECTOR_IDS}]"
 	for connID in ${ACCEPTED_CONNECTOR_IDS}; do
 		if [ "$CONNECTOR_ID" = "${connID}" ]; then
-			echo "[+] Author's ConnectorID found: '$connID'"
+			echo "[+][$COMMIT_HASH] Author's ConnectorID found: '$connID'"
 			valid_connID=1
 			break
 		fi
 	done
 
 	if [ $valid_connID = 0 ]; then
-		echo "[-] Author's ConnectorID is not allowed ('$CONNECTOR_ID')"
+		echo "[-][$COMMIT_HASH] Author's ConnectorID is not allowed ('$CONNECTOR_ID')"
 		exit 104
 	fi
 fi
 
 if [ "$CHECK_SIGNING_DATE" = true ]; then
-	echo "[*] Verifying Commit Date is in SigningCertificate's Validity Period"
+	echo "[*][$COMMIT_HASH] Verifying Commit Date is in SigningCertificate's Validity Period"
 	# echo "[@] ${DATE_NOT_BEFORE_U} <= ${COMMIT_DATE_U} <= ${DATE_NOT_AFTER_U}" # Debug
 
 	if [ "$COMMIT_DATE_U" -lt "$DATE_NOT_BEFORE_U" ]; then
-		echo "[-] Commit date '${COMMIT_DATE}' is BEFORE [${DATE_NOT_BEFORE}, ${DATE_NOT_AFTER}]"
+		echo "[-][$COMMIT_HASH] Commit date '${COMMIT_DATE}' is BEFORE [${DATE_NOT_BEFORE}, ${DATE_NOT_AFTER}]"
 		exit 110
 	fi
 	if [ "$COMMIT_DATE_U" -gt "$DATE_NOT_AFTER_U" ]; then
-		echo "[-] Commit date '${COMMIT_DATE}' is AFTER [${DATE_NOT_BEFORE}, ${DATE_NOT_AFTER}]"
+		echo "[-][$COMMIT_HASH] Commit date '${COMMIT_DATE}' is AFTER [${DATE_NOT_BEFORE}, ${DATE_NOT_AFTER}]"
 		exit 111
 	fi
 
-	echo "[+] Commit date: '${COMMIT_DATE}' is in [${DATE_NOT_BEFORE}, ${DATE_NOT_AFTER}]"
+	echo "[+][$COMMIT_HASH] Commit date: '${COMMIT_DATE}' is in [${DATE_NOT_BEFORE}, ${DATE_NOT_AFTER}]"
 fi
 
 exit 0

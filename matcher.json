@@ -1,0 +1,14 @@
+
+{
+  "problemMatcher": [
+    {
+      "owner": "gitsign-verify-sh",
+      "pattern": [
+        {
+          "regexp": "^\\[-\\]\\s*(.*)$",
+          "message": 1,
+        }
+      ]
+    }
+  ]
+}

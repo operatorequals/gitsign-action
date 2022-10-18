@@ -61,6 +61,12 @@ runs:
         git fetch origin ${{ github.ref }} --shallow-exclude ${{ inputs.ref }}
         git fetch origin ${{ inputs.ref }}
 
+    - name: '[GithubActionMatcher] Add matcher'
+      shell: bash
+      run: |
+        # Add matcher for Github Action Warnings
+        echo "::add-matcher::${GITHUB_ACTION_PATH}/matcher.json"
+
     - name: '[Gitsign] Verify Commits'
       shell: bash
       run: |
@@ -80,3 +86,9 @@ runs:
         EMAIL_DOMAINS: '${{ inputs.email-domains }}'
         ACCEPTED_CONNECTOR_IDS: '${{ inputs.connector-ids }}'
         CHECK_SIGNING_DATE: '${{ inputs.check-signing-date }}'
+
+    - name: '[GithubActionMatcher] Remove matcher'
+      shell: bash
+      run: |
+        # Add matcher for Github Action Warnings
+        echo "::remove-matcher owner=gitsign-verify-sh::"
