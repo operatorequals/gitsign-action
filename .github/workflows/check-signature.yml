@@ -22,10 +22,16 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Check Signatures
+      id: signature-verification
       uses: operatorequals/gitsign-action@feat/signing_date_check
+      continue-on-error: true
       with:
         ref: init
         version: '0.3.1'
         email-domains: 'gmail.com'
         connector-ids: 'https://github.com/login/oauth'
         check-signing-date: true
+
+    - name: '[Test] Fail if verification succeeds'
+      run: exit 1
+      if: steps.signature-verification.outcome == 'success'
