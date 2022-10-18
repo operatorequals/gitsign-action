@@ -88,7 +88,8 @@ runs:
         CHECK_SIGNING_DATE: '${{ inputs.check-signing-date }}'
 
     - name: '[GithubActionMatcher] Remove matcher'
+      if: always()
       shell: bash
       run: |
-        # Add matcher for Github Action Warnings
+        # Remove Github Action matcher
         echo "::remove-matcher owner=gitsign-verify-sh::"
