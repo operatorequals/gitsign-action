@@ -73,7 +73,7 @@ If an unsigned commit gets checked, this action will directly stop with an error
 
 As (as of now) `gitsign verify` does only check if a commit signature exists, this would pass `git verify-commit <commit-id>`
  command (https://github.com/sigstore/gitsign/issues/104).
- Yet, This Github Action does validate that commit author and and email found in the `SigningCertificate` are the same string.
+ Yet, This Github Action does validate that the commit author email and the email found in the `SigningCertificate` are the same string.
 
 ### Pushes a Git commit with author email same with signing email `random091[...]74@gmail.com`
 
